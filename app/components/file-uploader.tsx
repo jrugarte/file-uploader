@@ -143,6 +143,18 @@ const FileUploadComponent: React.FC = () => {
     }
   };
 
+  const FileSkeleton = () => (
+    <div className="bg-white p-4 rounded-lg shadow-sm animate-pulse">
+      <div className="flex items-center justify-between mb-2">
+        <div className="w-8 h-8 bg-gray-200 rounded"></div>
+        <div className="flex space-x-2"></div>
+        <div className="w-1/2 h-4 bg-gray-200 rounded"></div>
+        <div className="w-8 h-8 bg-gray-200 rounded"></div>
+        <div className="w-8 h-8 bg-gray-200 rounded"></div>
+      </div>
+    </div>
+  );
+
   return (
     <ErrorBoundary
       fallback={
@@ -205,41 +217,53 @@ const FileUploadComponent: React.FC = () => {
           </div>
         </form>
 
-        <div className="flex flex-col gap-4">
-          {files.map((file) => (
-            <div
-              key={file.pathname}
-              className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
-            >
-              <div className="flex items-center justify-between mb-2">
-                <File className="h-6 w-6 text-blue-500" />
-                <a
-                  href={file.url}
-                  download={file.name}
-                  className="text-sm font-medium text-gray-900 truncate block"
-                >
-                  {file.name}
-                </a>
-                <div className="flex space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => openRenameModal(file)}
+        {isLoading ? (
+          <div className="flex flex-col gap-4">
+            {[...Array(4)].map((_, index) => (
+              <FileSkeleton key={index} />
+            ))}
+          </div>
+        ) : files.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-gray-500">No files uploaded yet.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-4">
+            {files.map((file) => (
+              <div
+                key={file.pathname}
+                className="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <File className="h-6 w-6 text-blue-500" />
+                  <a
+                    href={file.url}
+                    download={file.name}
+                    className="text-sm font-medium text-gray-900 truncate block"
                   >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleDelete(file)}
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
+                    {file.name}
+                  </a>
+                  <div className="flex space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => openRenameModal(file)}
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleDelete(file)}
+                    >
+                      <Trash className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <Dialog open={renameModalOpen} onOpenChange={setRenameModalOpen}>
           <DialogContent className="sm:max-w-[425px]">
